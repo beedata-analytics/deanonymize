@@ -1,0 +1,9 @@
+{
+	"--margin-left": "0",
+	"--margin-right": "10",
+	"--margin-top": "10",
+	"--margin-bottom": "0",
+	"--page-size": "A4",
+	"--orientation": "Landscape",
+	"--zoom": "2"
+}
