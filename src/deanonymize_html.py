@@ -17,4 +17,5 @@ class DeanonymizeHTML(object):
             with open(filename.replace('~', '~deanonymized~'), 'w') as outfile:
                 outfile.write(anonymized_template.substitute(translations))
 weweweew
+fdfdf
         return outfile.name
