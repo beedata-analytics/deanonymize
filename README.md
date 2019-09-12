@@ -18,8 +18,14 @@ $ sudo docker-compose run deanonymize
 
 ### Usage
 
+One single report:
+
 ```sh
-$ python src/run.py --report output/697~201905.html --data data/sample.csv --layout layout/landscape.json
+$ python src/run.py --report reports/697~201905.html --data data/sample.csv --layout layout/landscape.json --output pdf
 ```
 
-output files `output/697~deanonymized~201905.html` and `output/697~deanonymized~201905.pdf` will be generated.
+All html reports on a directory:
+
+```sh
+$ python src/run.py --report reports --data data/sample.csv --layout layout/landscape.json --output pdf
+```
