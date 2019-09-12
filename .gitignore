@@ -1,4 +1,6 @@
 .remote-sync.json
 *.pyc
 data/
-output/
+reports/
+pdf/
+
