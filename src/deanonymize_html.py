@@ -1,24 +1,63 @@
-import string
 import codecs
 import csv
+import os
+import shutil
+import subprocess
+import unicodedata
+from ast import parse
 
 
 class DeanonymizeHTML(object):
     @staticmethod
-    def replace_html(filename, data):
+    def replace_html(filename, data, delimiter, batch_text):
+        """fix the contract name """
+
+        def valid_variable_name(name):
+            try:
+                parse("{} = None".format(name))
+                return name
+            except Exception:
+                # general case
+                # new_name = hashlib.md5(name).hexdigest()
+                # only considering the enercoop case
+                new_name = name.replace("-", "_")
+                return new_name
+
         """Replaces anonymized tokens in a given file with real data."""
-        with open(data, mode="r", encoding="utf-8") as infile:
-            csv_reader = csv.DictReader(infile)
+
+        name = os.path.split(filename)[1]
+        extension = os.path.splitext(filename)[1]
+        new_name = name.split("~")[0] + "-" + batch_text + extension
+        target = filename.replace(name, new_name)
+        shutil.copyfile(filename, target)
+
+        with codecs.open(data, mode="r", encoding="utf-8") as infile:
+            csv_reader = csv.DictReader(infile, delimiter=delimiter)
             translations = {
-                "%s_%s" % (cell, row["id"]): row[cell]
+                # avoiding special characters and replacing
+                # blank spaces with '_'
+                "%s_%s"
+                % (
+                    unicodedata.normalize("NFKD", cell)
+                    .encode("ascii", "ignore")
+                    .decode("ascii")
+                    .replace(" ", "_"),
+                    valid_variable_name(row["Contrat"]),
+                ): row[cell]
+                .encode("ascii", "xmlcharrefreplace")
+                .decode("ascii")
                 for row in csv_reader
                 for cell in row.keys()
             }
+            contract = valid_variable_name(
+                os.path.basename(filename).split("~")[0]
+            )
 
-        with codecs.open(filename, "r", encoding="utf-8") as anonymized_html:
-            anonymized_template = string.Template(anonymized_html.read())
-            with open(filename.replace("~", "~deanonymized~"), "w") as outfile:
-                outfile.write(
-                    anonymized_template.safe_substitute(translations)
-                )
-        return outfile.name
+            translations = {
+                k: translations[k] for k in translations if contract in k
+            }
+
+        for key in translations:
+            subprocess.call(
+                ["src/sed_replace.sh", key, translations[key], target],
+            )

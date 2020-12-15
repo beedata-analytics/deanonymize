@@ -1,14 +1,18 @@
-import optparse
 import json
+import optparse
 import os
 
-from utils_report import UtilsReport
 from deanonymize_html import DeanonymizeHTML
+from utils_report import UtilsReport
 
 
-def deanonymize_report(report, data, layout, output_dir):
+def deanonymize_report(
+    report, data, layout, output_dir, delimiter, batch_text
+):
     """Deanonymize report and convert it to PDF."""
-    output_filename = DeanonymizeHTML.replace_html(report, data)
+    output_filename = DeanonymizeHTML.replace_html(
+        report, data, delimiter, batch_text
+    )
     with open(layout) as json_file:
         UtilsReport.write_pdf_landscape(
             output_filename, json.load(json_file), output_dir
@@ -28,6 +32,22 @@ if __name__ == "__main__":
         "-r", "--report", dest="report", help="Report file or directory name"
     )
     parser.add_option("-o", "--output", dest="output", help="Output directory")
+    parser.add_option(
+        "--delimiter",
+        dest="delimiter",
+        default=",",
+        help="delimiter in the data filename, default value ',' ",
+    )
+    parser.add_option(
+        "--batch-month",
+        dest="batch_month",
+        help="Batch month to be included in the filename",
+    )
+    parser.add_option(
+        "--batch-number",
+        dest="batch_number",
+        help="Batch number to be included in the filename",
+    )
 
     (options, args) = parser.parse_args()
 
@@ -47,9 +67,16 @@ if __name__ == "__main__":
                 options.data,
                 options.layout,
                 options.output,
+                options.delimiter,
+                str(options.batch_month) + "-" + str(options.batch_number),
             )
 
     if os.path.isfile(options.report):
         deanonymize_report(
-            options.report, options.data, options.layout, options.output
+            options.report,
+            options.data,
+            options.layout,
+            options.output,
+            options.delimiter,
+            str(options.batch_month) + "-" + str(options.batch_number),
         )
