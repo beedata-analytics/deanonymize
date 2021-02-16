@@ -1,6 +1,6 @@
 # deanonymize
 
-Deanonimize html files and convert them to pdf.
+Deanonymize html files and convert them to pdf.
 
 A Docker image with all software, libraries and configuration needed is provided.
 
