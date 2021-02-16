@@ -42,7 +42,7 @@ class DeanonymizeHTML(object):
                     .encode("ascii", "ignore")
                     .decode("ascii")
                     .replace(" ", "_"),
-                    valid_variable_name(row["Contrat"]),
+                    valid_variable_name(row["id"]),
                 ): row[cell]
                 .encode("ascii", "xmlcharrefreplace")
                 .decode("ascii")
@@ -59,5 +59,7 @@ class DeanonymizeHTML(object):
 
         for key in translations:
             subprocess.call(
-                ["src/sed_replace.sh", key, translations[key], target],
+                ["src/scripts/sed_replace.sh", key, translations[key], target],
             )
+
+        return target
