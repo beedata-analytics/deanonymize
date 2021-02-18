@@ -4,18 +4,17 @@ import os
 from multiprocessing import Pool
 
 import click
-from tqdm import tqdm
-
 from deanonymize_html import DeanonymizeHTML
+from tqdm import tqdm
 from utils_report import UtilsReport
 
 
 def deanonymize_report(
-    report, data, layout, output_dir, delimiter, batch_text
+    report, data, layout, output_dir, delimiter, id, batch_text
 ):
     """Deanonymize report and convert it to PDF."""
     output_filename = DeanonymizeHTML.replace_html(
-        report, data, delimiter, batch_text
+        report, data, delimiter, id, batch_text
     )
     with open(layout) as json_file:
         UtilsReport.write_pdf_landscape(
@@ -35,13 +34,21 @@ def deanonymize_report(
     help="Report file or directory name",
 )
 @click.option(
-    "--output", type=click.Path(exists=True), help="Output directory",
+    "--output",
+    type=click.Path(exists=True),
+    help="Output directory",
 )
 @click.option(
     "--delimiter",
     type=click.STRING,
     default=",",
-    help="delimiter in the data filename, default value ',' ",
+    help="Delimiter in the data filename, default value ',' ",
+)
+@click.option(
+    "--id",
+    type=click.STRING,
+    default="id",
+    help="Identifier in the data filename",
 )
 @click.option(
     "--batch-month",
@@ -53,13 +60,14 @@ def deanonymize_report(
     type=click.INT,
     help="Batch number to be included in the filename",
 )
-@click.option("--processes", default=2, type=click.INT)
+@click.option("--processes", default=16, type=click.INT)
 def run(
     data,
     layout,
     report,
     output,
     delimiter,
+    id,
     batch_month,
     batch_number,
     processes,
@@ -81,25 +89,24 @@ def run(
                 [layout],
                 [output],
                 [delimiter],
+                [id],
                 [batch_month],
                 [batch_number],
             )
         )
 
-        pool = Pool(processes=processes)
-        with tqdm(total=len(docs)) as pbar:
-            for result in pool.imap_unordered(func=deanonymize, iterable=docs):
-                pbar.update()
-
-        for filename in onlyfiles:
-            deanonymize_report(
-                filename,
-                data,
-                layout,
-                output,
-                delimiter,
-                str(batch_month) + "-" + str(batch_number),
-            )
+        if processes > 1:
+            pool = Pool(processes=processes)
+            with tqdm(total=len(docs)) as pbar:
+                for result in pool.imap_unordered(
+                    func=deanonymize, iterable=docs
+                ):
+                    pbar.update()
+        else:
+            with tqdm(total=len(docs)) as pbar:
+                for doc in docs:
+                    deanonymize(doc)
+                    pbar.update()
 
     if os.path.isfile(report):
         deanonymize_report(
@@ -108,6 +115,7 @@ def run(
             layout,
             output,
             delimiter,
+            id,
             str(batch_month) + "-" + str(batch_number),
         )
 
@@ -119,6 +127,7 @@ def deanonymize(contract):
         layout,
         output,
         delimiter,
+        id,
         batch_month,
         batch_number,
     ) = contract
@@ -128,6 +137,7 @@ def deanonymize(contract):
         layout,
         output,
         delimiter,
+        id,
         str(batch_month) + "-" + str(batch_number),
     )
 

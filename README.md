@@ -30,6 +30,8 @@ $ python3 src/run.py
   --batch-month 202010
   --batch-number 1
   --delimiter ','
+  --processes 16
+  --id id
 
 ```
 
@@ -44,4 +46,6 @@ $ python3 src/run.py
   --batch-month 202010
   --batch-number 1
   --delimiter ','
+  --processes 16
+  --id id
 ```
