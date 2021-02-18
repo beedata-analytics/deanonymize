@@ -2,16 +2,19 @@
 
 Deanonymize html files and convert them to pdf.
 
-A Docker image with all software, libraries and configuration needed is provided.
+![Python application](https://github.com/beedata-analytics/deanonymize/workflows/Python%20application/badge.svg)
 
 ## Install Docker
+
+A Docker image with all software, libraries and configuration needed is provided.
 
 1. [Install Docker](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
 2. [Install Docker Compose](https://docs.docker.com/compose/install/)
 
 ## Run Docker image
 
-```sh
+```bash
+$ sudo docker-compose build deanonymize
 $ sudo docker-compose run deanonymize
 ```
 
@@ -21,7 +24,7 @@ $ sudo docker-compose run deanonymize
 
 One single report:
 
-```sh
+```bash
 $ python3 src/run.py
   --report reports/00001~202009.html
   --data data/sample.csv
@@ -37,7 +40,7 @@ $ python3 src/run.py
 
 All html reports on a directory:
 
-```sh
+```bash
 $ python3 src/run.py
   --report reports
   --data data/sample.csv
