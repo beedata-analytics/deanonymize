@@ -1,5 +1,7 @@
 # deanonymize
 
+![Python application](https://github.com/beedata-analytics/deanonymize/workflows/Python%20application/badge.svg)
+
 Deanonymize html files and convert them to pdf.
 
 A Docker image with all software, libraries and configuration needed is provided.
