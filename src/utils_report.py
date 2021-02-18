@@ -1,5 +1,6 @@
-import pdfkit
 from os import path
+
+import pdfkit
 
 
 class UtilsReport(object):

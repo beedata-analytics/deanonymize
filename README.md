@@ -1,6 +1,6 @@
 # deanonymize
 
-Deanonimize html files and convert them to pdf.
+Deanonymize html files and convert them to pdf.
 
 A Docker image with all software, libraries and configuration needed is provided.
 
@@ -22,12 +22,30 @@ $ sudo docker-compose run deanonymize
 One single report:
 
 ```sh
-$ python3 src/run.py --report reports/00001~202009.html --data data/sample.csv --layout layout/portrait.json --output pdf --batch-month 202010 --batch-number 1 --delimiter ','
+$ python3 src/run.py
+  --report reports/00001~202009.html
+  --data data/sample.csv
+  --layout layout/portrait.json
+  --output pdf
+  --batch-month 202010
+  --batch-number 1
+  --delimiter ','
+  --processes 16
+  --id id
 
 ```
 
 All html reports on a directory:
 
 ```sh
-$ python3 src/run.py --report reports --data data/sample.csv --layout layout/portrait.json --output pdf --batch-month 202010 --batch-number 1 --delimiter ','
+$ python3 src/run.py
+  --report reports
+  --data data/sample.csv
+  --layout layout/portrait.json
+  --output pdf
+  --batch-month 202010
+  --batch-number 1
+  --delimiter ','
+  --processes 16
+  --id id
 ```

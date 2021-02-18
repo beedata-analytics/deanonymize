@@ -9,7 +9,7 @@ from ast import parse
 
 class DeanonymizeHTML(object):
     @staticmethod
-    def replace_html(filename, data, delimiter, batch_text):
+    def replace_html(filename, data, delimiter, id, batch_text):
         """fix the contract name """
 
         def valid_variable_name(name):
@@ -42,7 +42,7 @@ class DeanonymizeHTML(object):
                     .encode("ascii", "ignore")
                     .decode("ascii")
                     .replace(" ", "_"),
-                    valid_variable_name(row["Contrat"]),
+                    valid_variable_name(row[id]),
                 ): row[cell]
                 .encode("ascii", "xmlcharrefreplace")
                 .decode("ascii")
@@ -61,3 +61,5 @@ class DeanonymizeHTML(object):
             subprocess.call(
                 ["src/sed_replace.sh", key, translations[key], target],
             )
+
+        return target
