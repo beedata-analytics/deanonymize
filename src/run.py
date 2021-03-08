@@ -52,12 +52,12 @@ def deanonymize_report(
 )
 @click.option(
     "--batch-month",
-    type=click.INT,
+    type=click.STRING,
     help="Batch month to be included in the filename",
 )
 @click.option(
     "--batch-number",
-    type=click.INT,
+    type=click.STRING,
     help="Batch number to be included in the filename",
 )
 @click.option("--processes", default=16, type=click.INT)
