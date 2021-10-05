@@ -27,7 +27,7 @@ class DeanonymizeHTML(object):
 
         name = os.path.split(filename)[1]
         extension = os.path.splitext(filename)[1]
-        new_name = name.split("~")[0] + "-" + batch_text + extension
+        new_name = "%s%s%s" % (name.split("~")[0], "-" + batch_text if batch_text is not None else "", extension)
         target = filename.replace(name, new_name)
         shutil.copyfile(filename, target)
 

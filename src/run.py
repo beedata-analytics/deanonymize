@@ -138,7 +138,7 @@ def deanonymize(contract):
         output,
         delimiter,
         id,
-        str(batch_month) + "-" + str(batch_number),
+        "%s%s" % (str(batch_month), ("-" + str(batch_number)) if batch_number is not None else ""),
     )
 
 
