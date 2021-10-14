@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:16.04
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -14,14 +14,14 @@ RUN apt-get update \
 	python3-pip
 
 # Install dependencies
-RUN apt-get install -y build-essential xorg libssl1.0-dev libxrender-dev wget
-RUN apt-get update && apt-get install -y --no-install-recommends xvfb libfontconfig xfonts-75dpi
+RUN apt-get install -y build-essential xorg libxrender-dev wget
+RUN apt-get update && apt-get install -y --no-install-recommends xvfb libfontconfig fontconfig libjpeg-turbo8 xfonts-75dpi
 
 # Download and install wkhtmltopdf
-RUN wget --no-check-certificate https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.bionic_amd64.deb
+RUN wget --no-check-certificate https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.xenial_amd64.deb
 RUN dpkg -i --force-depends wkhtmltox_0.12.6-1*.deb
 RUN ln -s /usr/local/bin/wkhtml* /usr/bin
-RUN rm wkhtmltox_0.12.6-1.bionic_amd64.deb
+RUN rm wkhtmltox_0.12.6-1.*.deb
 
 # Install required libraries
 
