@@ -6,5 +6,6 @@
 	"--page-size": "A4",
 	"--orientation": "Landscape",
 	"--zoom": "2",
-	"--quiet": ""
+	"--quiet": "",
+	"--enable-local-file-access": ""
 }

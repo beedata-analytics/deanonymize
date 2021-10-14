@@ -1,6 +1,6 @@
 .remote-sync.json
+.idea
 *.pyc
 data/
 reports/
 pdf/
-
