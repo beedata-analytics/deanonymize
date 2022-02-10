@@ -1,5 +1,6 @@
 import itertools
 import json
+import logging
 import os
 from multiprocessing import Pool
 
@@ -8,19 +9,34 @@ from deanonymize_html import DeanonymizeHTML
 from tqdm import tqdm
 from utils_report import UtilsReport
 
+logger = logging.getLogger(__name__)
+
 
 def deanonymize_report(
-    report, data, layout, output_dir, delimiter, id, batch_text
+    report, data, layout, output_dir, delimiter, id, batch_text, update
 ):
     """Deanonymize report and convert it to PDF."""
-    output_filename = DeanonymizeHTML.replace_html(
-        report, data, delimiter, id, batch_text
-    )
-    with open(layout) as json_file:
-        UtilsReport.write_pdf_landscape(
-            output_filename, json.load(json_file), output_dir
-        )
-    os.remove(output_filename)
+
+    target = None
+    try:
+        target = DeanonymizeHTML.get_filename(report, batch_text)
+        pdf_filename = UtilsReport.get_output_filename(target, output_dir)
+        if not os.path.exists(pdf_filename) or update:
+            DeanonymizeHTML.replace_html(
+                report, target, data, delimiter, id, batch_text
+            )
+            with open(layout) as json_file:
+                UtilsReport.write_pdf_landscape(
+                    target, json.load(json_file), pdf_filename
+                )
+    except Exception as e:
+        logger.exception("Error deanonymizing report %s: %s", (id, e))
+
+    try:
+        if target is not None:
+            os.remove(target)
+    except OSError:
+        pass
 
 
 @click.command()
@@ -60,6 +76,7 @@ def deanonymize_report(
     type=click.STRING,
     help="Batch number to be included in the filename",
 )
+@click.option('--update/--no-update', default=False)
 @click.option("--processes", default=16, type=click.INT)
 def run(
     data,
@@ -71,6 +88,7 @@ def run(
     batch_month,
     batch_number,
     processes,
+    update,
 ):
     if not os.path.exists(output):
         print("Output directory %s created" % output)
@@ -92,6 +110,7 @@ def run(
                 [id],
                 [batch_month],
                 [batch_number],
+                [update],
             )
         )
 
@@ -117,6 +136,7 @@ def run(
             delimiter,
             id,
             str(batch_month) + "-" + str(batch_number),
+            update,
         )
 
 
@@ -130,6 +150,7 @@ def deanonymize(contract):
         id,
         batch_month,
         batch_number,
+        update,
     ) = contract
     deanonymize_report(
         report,
@@ -139,8 +160,8 @@ def deanonymize(contract):
         delimiter,
         id,
         "%s%s" % (str(batch_month), ("-" + str(batch_number)) if batch_number is not None else ""),
+        update,
     )
-
 
 if __name__ == "__main__":
     run()
