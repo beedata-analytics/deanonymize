@@ -8,8 +8,17 @@ from ast import parse
 
 
 class DeanonymizeHTML(object):
+
     @staticmethod
-    def replace_html(filename, data, delimiter, id, batch_text):
+    def get_filename(filename, batch_text):
+        name = os.path.split(filename)[1]
+        extension = os.path.splitext(filename)[1]
+        new_name = "%s%s%s" % (name.split("~")[0], "-" + batch_text if batch_text is not None else "", extension)
+        return filename.replace(name, new_name)
+
+
+    @staticmethod
+    def replace_html(filename, target, data, delimiter, id, batch_text):
         """fix the contract name """
 
         def valid_variable_name(name):
@@ -25,10 +34,6 @@ class DeanonymizeHTML(object):
 
         """Replaces anonymized tokens in a given file with real data."""
 
-        name = os.path.split(filename)[1]
-        extension = os.path.splitext(filename)[1]
-        new_name = "%s%s%s" % (name.split("~")[0], "-" + batch_text if batch_text is not None else "", extension)
-        target = filename.replace(name, new_name)
         shutil.copyfile(filename, target)
 
         with codecs.open(data, mode="r", encoding="utf-8") as infile:
