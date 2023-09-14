@@ -27,3 +27,15 @@ class UtilsReport(object):
                 "Report in pdf for file %s was not generated due to problems "
                 "in the write_pdf function. Error: %s" % (filename, e)
             )
+
+    @staticmethod
+    def valid_variable_name(name):
+        try:
+            parse("{} = None".format(name))
+            return name
+        except Exception:
+            # general case
+            # new_name = hashlib.md5(name).hexdigest()
+            # only considering the enercoop case
+            new_name = name.replace("-", "_")
+            return new_name

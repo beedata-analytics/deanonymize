@@ -2,9 +2,12 @@ import itertools
 import json
 import logging
 import os
-from multiprocessing import Pool
-
+import codecs
+import csv
+import unicodedata
 import click
+
+from multiprocessing import Pool
 from deanonymize_html import DeanonymizeHTML
 from tqdm import tqdm
 from utils_report import UtilsReport
@@ -23,7 +26,7 @@ def deanonymize_report(
         pdf_filename = UtilsReport.get_output_filename(target, output_dir)
         if not os.path.exists(pdf_filename) or update:
             DeanonymizeHTML.replace_html(
-                report, target, data, delimiter, id, batch_text
+                report, target, data
             )
             with open(layout) as json_file:
                 UtilsReport.write_pdf_landscape(
@@ -37,6 +40,33 @@ def deanonymize_report(
             os.remove(target)
     except OSError:
         pass
+
+
+def read_data(data_file, delimiter, id):
+    rows = {}
+    with codecs.open(data_file, mode="r", encoding="utf-8") as infile:
+        csv_reader = csv.DictReader(infile, delimiter=delimiter)
+        for row in csv_reader:
+            contract_key = UtilsReport.valid_variable_name(row[id])
+
+            rows.update(
+                {
+                    contract_key:
+                        {
+                            "%s_%s"
+                            % (
+                                unicodedata.normalize("NFKD", cell)
+                                .encode("ascii", "ignore")
+                                .decode("ascii")
+                                .replace(" ", "_"),
+                                contract_key,
+                            ): row[cell]
+                            for cell in row.keys()
+                        }
+                }
+            )
+
+    return rows
 
 
 @click.command()
@@ -93,6 +123,9 @@ def run(
     if not os.path.exists(output):
         print("Output directory %s created" % output)
         os.mkdir(output)
+
+
+    data = read_data(data, delimiter, id)
 
     if os.path.isdir(report):
         onlyfiles = [
